@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor de Evaluación Macroeconómica Familiar v16.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Roboto+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <div>
+                    <span class="logo-main">AUDITORÍA FAMILIAR</span>
+                    <span class="logo-sub">Macro-Evaluador de Vulnerabilidad</span>
+                </div>
+            </div>
+            <div class="nav-menu">
+                <a href="#" class="nav-link"><i class="fas fa-home"></i> Inicio</a>
+                <a href="#auditForm" class="nav-link"><i class="fas fa-calculator"></i> Panel de Ingreso</a>
+                <a href="#outputArea" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> Reporte Final</a>
+            </div>
+            <div class="system-status">
+                <span class="status-dot"></span> MOTOR ACTIVO v16.0
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="intro-context-box">
+            <div class="context-card">
+                <h2><i class="fas fa-info-circle"></i> Sistema de Simulación Micro-Financiera</h2>
+                <h2>¿Para qué sirve este simulador?</h2>
+                <p>Este simulador permite calcular el impacto económico que generan los bloqueos, protestas y conflictos
+                    sociales en la economía de las familias paceñas. A través de datos reales, muestra cómo estas
+                    situaciones afectan directamente el poder adquisitivo de los ciudadanos, incrementando sus gastos
+                    cotidianos mientras sus ingresos permanecen constantes.
+                </p>
+                <h2>¿Cómo ayuda al usuario?</h2>
+                <p>La herramienta permite identificar y cuantificar los costos adicionales ocasionados por la crisis
+                    social. Entre ellos se encuentran los gastos extras en transporte debido a desvíos, trameajes o
+                    interrupciones del servicio, así como el aumento en el consumo de combustible y el tiempo perdido en
+                    filas para abastecimiento.
+
+                    Además, facilita el cálculo del incremento en el precio de productos básicos como alimentos,
+                    verduras y otros bienes esenciales que suelen encarecerse cuando las rutas de abastecimiento se ven
+                    afectadas por bloqueos o restricciones de circulación.
+                </p>
+                <h2>¿Qué resultados ofrece?</h2>
+                <p>El simulador muestra de manera clara cómo estos factores reducen el valor real de los ingresos
+                    familiares. Por ejemplo, permite visualizar cuánto poder de compra se pierde debido al aumento de
+                    gastos ocasionado por la coyuntura social.
+
+                    Asimismo, evalúa el nivel de afectación económica del hogar, clasificándolo en categorías como
+                    Moderado, Alto o Crítico según sus ingresos y características familiares. De esta manera, la
+                    plataforma se convierte en una herramienta de análisis que permite comprender, mediante datos
+                    concretos, cómo los conflictos sociales repercuten en la economía diaria de las familias paceñas.
+                </p>
+            </div>
+        </header>
+
+        <main class="grid-main">
+
+            <section class="panel-input">
+                <div class="panel-header">
+                    <h2><i class="fas fa-folder-open"></i> Variables de Auditoría</h2>
+                    <p>Mapeado estructural de la organización familiar y flujos salariales.</p>
+                </div>
+
+                <form id="auditForm">
+
+                    <div class="input-card accent-blue">
+                        <h3 class="card-title"><i class="fas fa-users"></i> 1. Estructura y Densidad del Hogar</h3>
+                        <div class="row mb-10">
+                            <div class="field">
+                                <label for="inMembers">Miembros Totales</label>
+                                <input type="number" id="inMembers" min="1" value="1" required>
+                            </div>
+                            <div class="field">
+                                <label for="inElderly">Adultos Mayores</label>
+                                <input type="number" id="inElderly" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label for="inChildren">Niños / Dependientes</label>
+                                <input type="number" id="inChildren" min="0" value="0">
+                            </div>
+                            <div class="field">
+                                <label for="inPets">Mascotas Protegidas</label>
+                                <input type="number" id="inPets" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="row mt-10">
+                            <div class="field">
+                                <label for="inDisability">¿Existe alguna discapacidad en el núcleo?</label>
+                                <select id="inDisability">
+                                    <option value="no">No, ninguna registrada</option>
+                                    <option value="si">Sí, requiere atención/gasto médico</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-card accent-green">
+                        <h3 class="card-title"><i class="fas fa-wallet"></i> 2. Arquitectura de Ingresos</h3>
+                        <div class="row mb-10">
+                            <div class="field">
+                                <label for="inIncome">Sueldo Base Mensual (Bs.)</label>
+                                <input type="number" id="inIncome" min="0" step="0.01" value="0" required>
+                            </div>
+                            <div class="field">
+                                <label for="inExtra">Ingresos Extras / Remesas (Bs.)</label>
+                                <input type="number" id="inExtra" min="0" step="0.01" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label for="inLaborStability">Consolidación y Estabilidad Laboral</label>
+                                <select id="inLaborStability">
+                                    <option value="estable">Asalariado Fijo / Contrato Indefinido</option>
+                                    <option value="temporal">Contratos Temporales / Consultorías</option>
+                                    <option value="independiente">Comerciante Independiente / Informal</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-card accent-orange">
+                        <h3 class="card-title"><i class="fas fa-car-side"></i> 3. Logística de Movilidad</h3>
+                        <div class="row mb-10">
+                            <div class="field">
+                                <label for="inTransportType">Régimen Operativo de Transporte</label>
+                                <select id="inTransportType" onchange="toggleTransportFields()">
+                                    <option value="publico">Transporte Público Exclusivo</option>
+                                    <option value="personal">Vehículo Privado / Combustible Fósil</option>
+                                    <option value="ambos">Uso Combinado (Ambos)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="groupPublicTransport" class="transport-subgroup mb-10">
+                            <span class="field-desc"><i class="fas fa-bus"></i> Tarifas de Pasajes Colectivos</span>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="inBusHist">Gasto Mensual Histórico (Bs.)</label>
+                                    <input type="number" id="inBusHist" min="0" step="0.01" value="0">
+                                </div>
+                                <div class="field">
+                                    <label for="inBusNow">Gasto Mensual Actual (Bs.)</label>
+                                    <input type="number" id="inBusNow" min="0" step="0.01" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="groupPersonalTransport" class="transport-subgroup">
+                            <span class="field-desc"><i class="fas fa-gas-pump"></i> Suministro de Carburantes</span>
+                            <div class="row">
+                                <div class="field">
+                                    <label for="inGasHist">Costo Mensual Histórico (Bs.)</label>
+                                    <input type="number" id="inGasHist" min="0" step="0.01" value="0">
+                                </div>
+                                <div class="field">
+                                    <label for="inGasNow">Costo Mensual Actual (Bs.)</label>
+                                    <input type="number" id="inGasNow" min="0" step="0.01" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-card accent-purple">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> 4. Suministros Básicos Desagregados</h3>
+                        <div class="row mb-10">
+                            <div class="field">
+                                <label for="inGasType">Tipo de Red de Gas</label>
+                                <select id="inGasType">
+                                    <option value="garrafa">Gas Licuado en Garrafa (GLP)</option>
+                                    <option value="domiciliario">Gas Natural por Red Domiciliaria</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="inGasCost">Factura Gas Mensual (Bs.)</label>
+                                <input type="number" id="inGasCost" min="0" step="0.01" value="0">
+                            </div>
+                        </div>
+                        <div class="grid-services">
+                            <div class="field">
+                                <label for="inLuz">Fluido Eléctrico (Bs.)</label>
+                                <input type="number" id="inLuz" min="0" step="0.01" value="0">
+                            </div>
+                            <div class="field">
+                                <label for="inAgua">Agua Potable (Bs.)</label>
+                                <input type="number" id="inAgua" min="0" step="0.01" value="0">
+                            </div>
+                            <div class="field">
+                                <label for="inNet">Internet/Telefónia (Bs.)</label>
+                                <input type="number" id="inNet" min="0" step="0.01" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-card accent-red">
+                        <h3 class="card-title"><i class="fas fa-basket-shopping"></i> 5. Canasta de Supervivencia y Obligaciones</h3>
+                        <div class="row mb-10">
+                            <div class="field">
+                                <label for="inFoodHist">Canasta Alimentaria Antes (Bs.)</label>
+                                <input type="number" id="inFoodHist" min="0" step="0.01" value="0" required>
+                            </div>
+                            <div class="field">
+                                <label for="inFoodNow">Canasta Alimentaria Ahora (Bs.)</label>
+                                <input type="number" id="inFoodNow" min="0" step="0.01" value="0" required>
+                            </div>
+                        </div>
+                        <div class="row mb-10">
+                            <div class="field">
+                                <label for="inHousingType">Régimen del Inmueble</label>
+                                <select id="inHousingType" onchange="toggleHousingField()">
+                                    <option value="propia">Casa Propia (Sin Pasivos Vigentes)</option>
+                                    <option value="alquiler">Contrato de alquiler</option>
+                                    <option value="hipoteca">Vivienda con Crédito Hipotecario Activo</option>
+                                    <option value="anticretico">Régimen de Anticrético</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="groupHousingCost" class="row mb-10" style="display: none;">
+                            <div class="field">
+                                <label id="lblHousingCost" for="inHouse">Costo Financiero Inmueble (Bs.)</label>
+                                <input type="number" id="inHouse" min="0" step="0.01" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label for="inDebt">Amortización de Otras Deudas / Tarjetas (Bs.)</label>
+                                <input type="number" id="inDebt" min="0" step="0.01" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="button" id="btnDemoCase" class="btn-sub" style="background-color: var(--clr-blue); color: white; border-color: var(--clr-blue);"><i class="fas fa-database"></i> Cargar Caso de Estudio (Demo)</button>
+                        <button type="submit" class="btn-main"><i class="fas fa-calculator"></i> PROCESAR AUDITORÍA ECONÓMICA</button>
+                        <button type="reset" class="btn-sub" onclick="setTimeout(()=>{toggleTransportFields(); toggleHousingField();}, 50)"><i class="fas fa-rotate-left"></i> Restablecer Formulario</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel-output" id="outputArea">
+                <div class="empty-msg">
+                    <i class="fas fa-server"></i>
+                    <h3>Esperando Instrucciones del Operador</h3>
+                    <p>Modifique los valores paramétricos del formulario y presione el botón de procesamiento para
+                        compilar el dictamen macroeconómico familiar.</p>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="main-footer">
+            <p>&copy; 2026 Motor de Evaluación Macroeconómica Familiar v16.0. Licencia Corporativa de Uso Exclusivo.</p>
+            <p>Monitoreo y Auditoría del Núcleo Familiar • La Paz - Bolivia</p>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
