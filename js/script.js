@@ -1,9 +1,8 @@
 /**
- * MOTOR DE EVALUACIÓN MACROECONÓMICA FAMILIAR v16.0
+ * MOTOR DE EVALUACIÓN MACROECONÓMICA FAMILIAR v16.7
  * Desarrollo por: ROJAS REBECA
  */
 
-// VARIABLE DE CONTROL CONTROLADA: Detecta si es la primera vez que se carga la página
 let esCargaInicial = true;
 
 // CONTROL DINÁMICO DE VISUALIZACIÓN DE TRANSPORTE
@@ -47,12 +46,38 @@ function toggleHousingField() {
         label.innerText = "Cuota Hipotecaria Mensual (Bs.)";
     } else {
         costGroup.style.display = 'none';
-        input.value = 0; // Se resetea el valor si es casa propia o anticrético
+        input.value = 0;
     }
 }
 
+// FUNCIÓN DE VALIDACIÓN EN TIEMPO REAL (Resuelve el atasco de setCustomValidity)
+function validarDemografia() {
+    const inputMiembros = document.getElementById('inMembers');
+    const inputAbuelos = document.getElementById('inElderly');
+    const inputNinos = document.getElementById('inChildren');
+
+    if (!inputMiembros || !inputAbuelos || !inputNinos) return true;
+
+    // Reseteamos el error de inmediato para que el navegador nos deje escribir
+    inputMiembros.setCustomValidity("");
+
+    const miembrosTotales = parseInt(inputMiembros.value) || 0;
+    const adultosMayores = parseInt(inputAbuelos.value) || 0;
+    const ninosDependientes = parseInt(inputNinos.value) || 0;
+
+    // Si los campos están vacíos o están en proceso de edición, no bloquear
+    if (inputMiembros.value === "") return true;
+
+    // Ejecutar la prueba matemática
+    if ((adultosMayores + ninosDependientes) > miembrosTotales) {
+        inputMiembros.setCustomValidity("La suma de niños y adultos mayores no puede ser mayor que el total de miembros.");
+        return false;
+    }
+
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicialización de estados dinámicos controlados
     toggleTransportFields();
     toggleHousingField();
 
@@ -60,45 +85,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const outArea = document.getElementById('outputArea');
     const btnDemo = document.getElementById('btnDemoCase');
 
-    // LÓGICA DE AUTOMATIZACIÓN DE CASOS DE ESTUDIO (DEMO)
+    // ESCUCHADORES EN TIEMPO REAL: Limpian y validan cada vez que el usuario escribe
+    document.getElementById('inMembers')?.addEventListener('input', validarDemografia);
+    document.getElementById('inElderly')?.addEventListener('input', validarDemografia);
+    document.getElementById('inChildren')?.addEventListener('input', validarDemografia);
+
+    // BOTÓN DE DEMOSTRACIÓN AUTOMÁTICA
     if (btnDemo && form) {
         btnDemo.addEventListener('click', () => {
-            // Estructura y Densidad
             document.getElementById('inMembers').value = 4;
             document.getElementById('inElderly').value = 1;
             document.getElementById('inChildren').value = 2;
             document.getElementById('inPets').value = 1;
             document.getElementById('inDisability').value = 'no';
 
-            // Arquitectura de Ingresos
             document.getElementById('inIncome').value = 3500;
             document.getElementById('inExtra').value = 400;
             document.getElementById('inLaborStability').value = 'temporal';
 
-            // Logística de Movilidad
             document.getElementById('inTransportType').value = 'ambos';
-            toggleTransportFields(); // Sincroniza los campos visibles de transporte
+            toggleTransportFields();
             document.getElementById('inBusHist').value = 240;
             document.getElementById('inBusNow').value = 380;
             document.getElementById('inGasHist').value = 300;
             document.getElementById('inGasNow').value = 520;
 
-            // Suministros Básicos
             document.getElementById('inGasType').value = 'garrafa';
             document.getElementById('inGasCost').value = 45;
             document.getElementById('inLuz').value = 110;
             document.getElementById('inAgua').value = 65;
             document.getElementById('inNet').value = 150;
 
-            // Canasta, Vivienda y Obligaciones
             document.getElementById('inFoodHist').value = 1600;
             document.getElementById('inFoodNow').value = 2350;
             document.getElementById('inHousingType').value = 'alquiler';
-            toggleHousingField(); // Sincroniza los campos visibles de vivienda
+            toggleHousingField();
             document.getElementById('inHouse').value = 1200;
             document.getElementById('inDebt').value = 300;
 
-            // Disparar procesamiento automático tras el llenado de datos
+            // Forzar limpieza antes del submit de la demo
+            validarDemografia();
             form.dispatchEvent(new Event('submit'));
         });
     }
@@ -106,18 +132,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form || !outArea) return;
 
     form.addEventListener('submit', (e) => {
+        // Doble verificación antes de procesar
+        if (!validarDemografia()) {
+            form.reportValidity();
+            e.preventDefault();
+            return;
+        }
+
         e.preventDefault();
 
-        // VALIDACIÓN DE SEGURIDAD INTERNA: Bloqueo estricto de números negativos
+        // Validar que no haya negativos
         const todosLosInputs = form.querySelectorAll('input[type="number"]');
         for (let input of todosLosInputs) {
-            if (parseFloat(input.value) < 0) {
-                alert(`⚠️ Error de Validación: No se permiten valores negativos en el sistema.`);
-                return; // Detiene la ejecución completa del motor de cálculo
+            input.setCustomValidity("");
+            if (input.value !== "" && parseFloat(input.value) < 0) {
+                input.setCustomValidity("El valor debe ser superior o igual a 0");
+                form.reportValidity();
+                return; 
             }
         }
 
-        // 1. MAPEADO DE VARIABLES SIN EXCEPCIONES CON VALORES DE RESPALDO DEFENSIFOS
+        // Estructura de datos limpia
         const model = {
             members: parseInt(document.getElementById('inMembers')?.value) || 1,
             elderly: parseInt(document.getElementById('inElderly')?.value) || 0,
@@ -129,21 +164,18 @@ document.addEventListener('DOMContentLoaded', () => {
                          (parseFloat(document.getElementById('inExtra')?.value) || 0),
             laborStability: document.getElementById('inLaborStability')?.value || 'estable',
             
-            // Transporte
             transType: document.getElementById('inTransportType')?.value || 'publico',
             busH: parseFloat(document.getElementById('inBusHist')?.value) || 0,
             busN: parseFloat(document.getElementById('inBusNow')?.value) || 0,
             gasH: parseFloat(document.getElementById('inGasHist')?.value) || 0,
             gasN: parseFloat(document.getElementById('inGasNow')?.value) || 0,
             
-            // Suministros
             gasType: document.getElementById('inGasType')?.value || 'garrafa',
             gasCost: parseFloat(document.getElementById('inGasCost')?.value) || 0,
             luz: parseFloat(document.getElementById('inLuz')?.value) || 0,
             agua: parseFloat(document.getElementById('inAgua')?.value) || 0,
             net: parseFloat(document.getElementById('inNet')?.value) || 0,
             
-            // Canasta Básica, Vivienda y Obligaciones Civiles
             foodH: parseFloat(document.getElementById('inFoodHist')?.value) || 0,
             foodN: parseFloat(document.getElementById('inFoodNow')?.value) || 0,
             housingType: document.getElementById('inHousingType')?.value || 'propia',
@@ -151,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             debt: parseFloat(document.getElementById('inDebt')?.value) || 0
         };
 
-        // 2. LOGÍSTICA DE COSTOS INTERNOS Y CÁLCULO DE RATIOS MACROECONÓMICOS
+        // Cálculos financieros
         const serviciosTotales = model.luz + model.agua + model.net + model.gasCost;
         const totalHistDoc = model.busH + model.gasH + model.foodH + serviciosTotales + model.house + model.debt;
         const totalNowDoc = model.busN + model.gasN + model.foodN + serviciosTotales + model.house + model.debt;
@@ -160,20 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const saldoDisponible = model.sueldoTotal - totalNowDoc;
         const ratioGastoIngreso = model.sueldoTotal > 0 ? (totalNowDoc / model.sueldoTotal) : 2;
 
-        // PONDERACIONES CRÍTICAS DE ESTABILIDAD LABORAL
         let factorRiesgoLaboral = 0;
         let textoLaboralExplicativo = "Ingresos Estables / Fijos.";
         if (model.laborStability === 'independiente') { factorRiesgoLaboral = 15; textoLaboralExplicativo = "Totalmente Independiente / Variable."; }
         if (model.laborStability === 'temporal') { factorRiesgoLaboral = 10; textoLaboralExplicativo = "Contratos Temporales / Consultorías."; }
 
-        // Métrica integrada de vulnerabilidad estructural
-        const scoreVulnerabilidad = (ratioGastoIngreso * 100) + factorRiesgoLaboral;
-
-        // 3. CLASIFICACIÓN SEMAFÓRICA INTEGRAL Y DICTAMEN DE RIESGO
         let colorClaseDinamica = "dyn-verde";
         let semaforoClase = "v-verde";
         let semaforoTitulo = "Presupuesto Bajo Control";
-        let semaforoMensaje = "Estructura en equilibrio. Tus ingresos actuales logran mitigar los incrementos de precios y mantienes un remanente de ahorro.";
+        let semaforoMensaje = "Estructura en equilibrio. Tus ingresos actuales logran mitigar los incrementos de precios.";
         
         let explicacionSituacion = "";
         let recomendacionesMejora = "";
@@ -183,10 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
             colorClaseDinamica = "dyn-verde";
             semaforoClase = "v-verde";
             semaforoTitulo = "Presupuesto Bajo Control";
-            semaforoMensaje = "Estructura en equilibrio. Tus ingresos actuales logran mitigar los incrementos de precios y mantienes un remanente estante.";
-            
+            semaforoMensaje = "Estructura en equilibrio. Tus ingresos actuales logran mitigar los incrementos de precios y mantienes un remanente de ahorro.";
             explicacionSituacion = `Tu hogar se encuentra en una situación de <strong>superávit financiero</strong>. A pesar del encarecimiento generalizado de la canasta alimentaria y los servicios de transporte local, el volumen de tus ingresos combinados cubre la totalidad de tus obligaciones sin necesidad de recurrir al endeudamiento regular.`;
-            impactoFamiliar = `Para las familias con ingresos fijos o independientes en esta franja, la inflación actual representa una reducción marginal en la capacidad de ahorro superfluo, pero no pone en peligro ninguna necesidad básica. Sin embargo, si tu estatus es independiente, este equilibrio depende críticamente de que las redes de comercialización no sufran shocks ni paros prolongados.`;
+            impactoFamiliar = `Para las familias con ingresos fijos o independientes en esta franja, la inflación actual representa una reducción marginal en la capacidad de ahorro superfluo, pero no pone en peligro ninguna necesidad básica.`;
             recomendacionesMejora = `
                 <li><strong>Construcción de Blindaje:</strong> Destina un mínimo del 15% de tu saldo libre mensual a un fondo de contingencia líquido de emergencia.</li>
                 <li><strong>Abastecimiento Inteligente:</strong> Adelanta la compra de bienes no perecederos al por mayor en mercados centrales antes de nuevos picos estacionales inflacionarios.</li>
@@ -197,12 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
             semaforoClase = "v-amarillo";
             semaforoTitulo = "Alerta: Presupuesto Bajo Presión";
             semaforoMensaje = "Atención. El costo de manutención consume casi la totalidad de tus recursos disponibles, limitando seriamente tu respuesta ante emergencias.";
-
             explicacionSituacion = `Tu presupuesto se encuentra en un estado de <strong>estrés o equilibrio precario</strong>. Estás en un punto de "empate técnico": todo lo que ingresa al hogar se diluye de manera inmediata en gastos de subsistencia, transporte y pasivos financieros. Tu capacidad de ahorro real se ha reducido a cero.`;
-            impactoFamiliar = `Este escenario afecta drásticamente la resiliencia del núcleo. Cualquier gasto imprevisto (médico, averías mecánicas o estructurales, o ajustes imprevistos en tarifas de servicios) obligará a la familia a recortar porciones alimentarias o incurrir en deudas de alto riesgo. Si tus contratos son temporales o informales, un paro de actividades destruirá instantáneamente esta frágil estabilidad.`;
+            impactoFamiliar = `Este escenario afecta drásticamente la resiliencia del núcleo. Cualquier gasto imprevisto (médico, averías mecánicas o estructurales) obligará a la familia a recortar porciones alimentarias o incurrir en deudas de alto riesgo.`;
             recomendacionesMejora = `
-                <li><strong>Optimización de Logística:</strong> Si usas vehículo personal, evalúa migrar temporalmente a transporte público combinado o pooling (rutas compartidas) para detener la fuga acelerada en combustible.</li>
-                <li><strong>Sustitución de Canasta:</strong> Reemplaza marcas líderes por productos locales de mercados primarios o ferias del productor, mitigando los costes de intermediarios.</li>
+                <li><strong>Optimización de Logística:</strong> Si usas vehículo personal, evalúa migrar temporalmente a transporte público combinado para detener la fuga acelerada en combustible.</li>
+                <li><strong>Sustitución de Canasta:</strong> Reemplaza marcas líderes por productos locales de mercados primarios, mitigando los costes de intermediarios.</li>
                 <li><strong>Congelación estricta de Pasivos:</strong> Evita refinanciar deudas vigentes o utilizar líneas de crédito corrientes para consumos de primera necesidad.</li>
             `;
         } 
@@ -211,13 +236,12 @@ document.addEventListener('DOMContentLoaded', () => {
             semaforoClase = "v-rojo";
             semaforoTitulo = "Déficit y Vulnerabilidad Crítica";
             semaforoMensaje = "¡Emergencia Financiera! Estás gastando más de lo que percibes mensualmente. Riesgo inminente de insolvencia estructural.";
-
-            explicacionSituacion = `Tu economía familiar sufre un <strong>déficit financiero agudo (Sobregasto)</strong>. Estás desembolsando de manera real más dinero del que ingresa a tus arcas. La brecha inflacionaria acumulada en alimentos y transporte ha superado por completo tu capacidad salarial, obligándote a consumir ahorros previos, vender activos patrimobiales o acumular deudas de difícil sostenibilidad.`;
-            impactoFamiliar = `Para las familias en este estrato, el impacto es devastador y asimétrico. La presencia de miembros vulnerables (niños, adultos mayores o personas con discapacidad) agrava la crisis debido a la rigidez insustituible de sus costes médicos y alimentarios. En trabajadores independientes, esta situación genera una descapitalización rápida del capital de giro para cubrir la subsistencia diaria.`;
+            explicacionSituacion = `Tu economía familiar sufre un <strong>déficit financiero agudo (Sobregasto)</strong>. Estás desembolsando de manera real más dinero del que ingresa a tus arcas. La brecha inflacionaria acumulada en alimentos y transporte ha superado por completo tu capacidad salarial.`;
+            impactoFamiliar = `Para las familias en este estrato, el impacto es devastador y asimétrico. La presencia de miembros vulnerables (niños, adultos mayores o personas con discapacidad) agrava la crisis debido a la rigidez insustituible de sus costes médicos y alimentarios.`;
             recomendacionesMejora = `
-                <li><strong>Plan de Austeridad Drástica:</strong> Clasifica de forma inmediata tus egresos. Elimina de raíz cualquier servicio de entretenimiento o suscripción no esencial y reduce el consumo energético al mínimo técnico para mitigar la factura de servicios básicos.</li>
-                <li><strong>Reestructuración Urgente de Deudas:</strong> Acude a tus entidades bancarias antes de caer en mora legal para solicitar planes de diferimiento, prórrogas o compras de cartera. Evita prestamistas informales que comprometan tu flujo futuro.</li>
-                <li><strong>Activación de Economías Complementarias:</strong> Es perentorio diversificar los flujos monetarios del hogar mediante subempleos o comercialización secundaria que aporten liquidez diaria inmediata al núcleo familiar.</li>
+                <li><strong>Plan de Austeridad Drástica:</strong> Clasifica de forma inmediata tus egresos. Elimina de raíz cualquier servicio de entretenimiento o suscripción no esencial.</li>
+                <li><strong>Reestructuración Urgente de Deudas:</strong> Acude a tus entidades bancarias antes de caer en mora legal para solicitar planes de diferimiento o prórrogas.</li>
+                <li><strong>Activación de Economías Complementarias:</strong> Es perentorio diversificar los flujos monetarios del hogar mediante subempleos o comercialización secundaria.</li>
             `;
         }
 
@@ -230,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxEjeVal = Math.max(model.busH, model.busN, model.gasH, model.gasN, model.foodH, model.foodN, serviciosTotales, model.house, model.debt, 10);
         const getBarWidth = (v) => Math.min(((v / maxEjeVal) * 100), 100).toFixed(1);
 
-        // 4. INYECCIÓN DINÁMICA DE REPORTES CON OCULTAMIENTO INTELIGENTE DEL ANÁLISIS
+        // Renderizado del Reporte
         outArea.innerHTML = `
             <div class="report-card">
                 <div class="semaforo-banner ${semaforoClase}">
@@ -369,5 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
         esCargaInicial = false;
     });
 
+    // Lanzar primer submit controlado
+    validarDemografia();
     form.dispatchEvent(new Event('submit'));
 });
